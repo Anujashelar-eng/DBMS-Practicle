@@ -1,0 +1,77 @@
+-- 1. Create the Branch table
+CREATE TABLE Branch (
+    bname VARCHAR2(50) PRIMARY KEY,
+    city VARCHAR2(50)
+);
+
+-- 2. Create the Customer table
+CREATE TABLE Customer (
+    cname VARCHAR2(50) PRIMARY KEY,
+    city VARCHAR2(50)
+);
+
+-- 3. Create the Deposit table (after Branch and Customer)
+CREATE TABLE Deposit (
+    actno VARCHAR2(20) PRIMARY KEY,
+    cname VARCHAR2(50),
+    bname VARCHAR2(50),
+    amount NUMBER(10, 2),
+    adate DATE,
+    FOREIGN KEY (cname) REFERENCES Customer(cname),
+    FOREIGN KEY (bname) REFERENCES Branch(bname)
+);
+
+-- 4. Create the Borrow table (after Branch and Customer)
+CREATE TABLE Borrow (
+    loan_number VARCHAR2(20) PRIMARY KEY,
+    cname VARCHAR2(50),
+    bname VARCHAR2(50),
+    amount NUMBER(10, 2),
+    FOREIGN KEY (cname) REFERENCES Customer(cname),
+    FOREIGN KEY (bname) REFERENCES Branch(bname)
+);
+
+-- Insert data into Branch table
+INSERT INTO Branch (bname, city) VALUES ('Branch1', 'Bombay');
+INSERT INTO Branch (bname, city) VALUES ('Branch2', 'Delhi');
+INSERT INTO Branch (bname, city) VALUES ('Branch3', 'Pune');
+
+-- Insert data into Customer table
+INSERT INTO Customer (cname, city) VALUES ('Anil', 'Pune');
+INSERT INTO Customer (cname, city) VALUES ('Neha', 'Mumbai');
+INSERT INTO Customer (cname, city) VALUES ('Karan', 'Delhi');
+INSERT INTO Customer (cname, city) VALUES ('Anjali', 'Bombay');
+
+-- Insert data into Deposit table
+INSERT INTO Deposit (actno, cname, bname, amount, adate) VALUES ('A101', 'Anil', 'Branch1', 5000, TO_DATE('2023-01-15', 'YYYY-MM-DD'));
+INSERT INTO Deposit (actno, cname, bname, amount, adate) VALUES ('A102', 'Neha', 'Branch2', 12000, TO_DATE('2023-02-20', 'YYYY-MM-DD'));
+INSERT INTO Deposit (actno, cname, bname, amount, adate) VALUES ('A103', 'Karan', 'Branch3', 7500, TO_DATE('2023-03-10', 'YYYY-MM-DD'));
+
+-- Insert data into Borrow table
+INSERT INTO Borrow (loan_number, cname, bname, amount) VALUES ('L101', 'Anil', 'Branch1', 10000);
+INSERT INTO Borrow (loan_number, cname, bname, amount) VALUES ('L102', 'Neha', 'Branch2', 15000);
+INSERT INTO Borrow (loan_number, cname, bname, amount) VALUES ('L103', 'Karan', 'Branch3', 20000);
+
+-- Display names of all branches located in City Bombay
+SELECT bname
+FROM Branch
+WHERE city = 'Bombay';
+
+-- Display account number and amount of depositors
+SELECT actno, amount
+FROM Deposit;
+
+-- Update the city of customer ‘Anil’ from Pune to Mumbai
+UPDATE Customer
+SET city = 'Mumbai'
+WHERE cname = 'Anil' AND city = 'Pune';
+
+-- Find the number of depositors in the bank
+SELECT COUNT(*) AS number_of_depositors
+FROM Deposit;
+
+-- Calculate average salary of each department (assuming Employee table exists)
+-- wrong query
+
+-- Create an index on the Deposit table's amount column
+CREATE INDEX idx_deposit_amount ON Deposit (amount);

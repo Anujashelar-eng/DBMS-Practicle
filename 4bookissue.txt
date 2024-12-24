@@ -1,0 +1,74 @@
+CREATE TABLE A 
+ (Rollno number(10) NOT NULL, 
+  name varchar2(50), 
+  Date_of_issue date, 
+  name_of_book varchar2(10), 
+  Status varchar2(1),  
+  CONSTRAINT chk1 CHECK(Status IN('I','R')),
+  CONSTRAINT pk1 PRIMARY KEY (Rollno)
+ ); 
+//
+INSERT INTO A VALUES(1,'Arya','12-June-2021','DBMS','I');
+INSERT INTO A VALUES(2,'Neha','22-June-2024','DBMS','I');
+INSERT INTO A VALUES(3,'Swati','20-July-2023','DBMS','I');
+INSERT INTO A VALUES(4,'Samrudhhi','02-July-2022','DBMS','I');
+//
+INSERT ALL  
+  INTO A VALUES (5, 'Sham','22-Dec-2022','CN','I')  
+  INTO A VALUES (6, 'Ram','22-Aug-2022','CN','I')  
+  INTO A VALUES (7, 'Onkar','12-July-2022','CN','I')  
+SELECT * FROM dual;  
+//
+CREATE SEQUENCE seq1
+  MINVALUE 5
+  MAXVALUE 50
+  START WITH 10
+  INCREMENT BY 1
+  CACHE 2;
+//
+INSERT ALL  
+  INTO A VALUES (seq1.nextval, 'Dharmesh','22-Dec-2022','TOC','I')  
+  INTO A VALUES (seq1.nextval, 'Manas','20-Sep-2023','TOC','I')  
+  INTO A VALUES (Seq1.nextval, 'Diksha','12-Nov-2023','TOC','I')  
+SELECT * FROM dual; 
+// 
+INSERT INTO A VALUES (seq1.nextval, 'Dharmesh','22-Dec-2022','TOC','I');  
+//
+select * from A;
+//
+CREATE TABLE B 
+ (Rollno number(10) NOT NULL, 
+  Date_of_Return date, 
+  Fine number(10)
+ ); 
+//
+DECLARE
+roll number(10);
+bkn varchar2(50);
+idate date; 
+days number(5);
+fineamt number(5);
+
+BEGIN
+roll:=:roll;
+bkn:=:bkn;
+
+SELECT Date_of_issue INTO idate FROM A WHERE Rollno=roll AND name_of_book=bkn;
+dbms_output.put_line  ('Roll Number:' || roll); 
+dbms_output.put_line  ('Book Name  :' || bkn);
+dbms_output.put_line  ('Issue Date :' || idate);
+
+SELECT trunc(sysdate-idate) INTO days from DUAL;
+dbms_output.put_line  ('No of Days :' || days); 
+
+IF ( days > 15 ) AND ( days < 30 ) THEN 
+      fineamt:= days*5; 
+   ELSIF ( days >= 30 ) THEN 
+       fineamt:= days*10;
+END IF; 
+   dbms_output.put_line('FINE: '|| fineamt);  
+
+INSERT INTO B VALUES (roll, sysdate, fineamt);  
+update A SET Status='R' WHERE Rollno=roll AND name_of_book=bkn;
+end;
+/

@@ -1,0 +1,27 @@
+-- Create the AREA table if it doesn't already exist
+CREATE TABLE AREA (
+ radius NUMBER(5),
+ area NUMBER(14,2),
+ perimeter NUMBER(14,2)
+);
+-- Truncate the AREA table to remove existing data
+TRUNCATE TABLE AREA;
+-- PL/SQL block to calculate and insert area and perimeter for circles with radius 1 to 7
+DECLARE
+ r NUMBER(5); -- Radius
+ area NUMBER(14,2); -- Area
+ peri NUMBER(14,2); -- Perimeter
+ pi CONSTANT NUMBER(4,2) := 3.14; -- Constant value of Pi
+BEGIN
+ r := 1; -- Initialize radius to 1
+ WHILE r <= 7 LOOP
+ -- Calculate area and perimeter
+ area := pi * POWER(r, 2);
+ peri := 2 * pi * r;
+ -- Insert into AREA table
+ INSERT INTO AREA (radius, area, perimeter) VALUES (r, area, peri);
+-- Increment the radius for the next iteration
+ r := r + 1;
+ END LOOP;
+END;
+SELECT * FROM AREA;

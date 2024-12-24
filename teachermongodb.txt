@@ -1,0 +1,68 @@
+use SCOE
+// Teachers Collection
+db.createCollection("Teachers");
+db.Teachers.insertMany([
+  { Tname: "Praveen", dno: 101, dname: "Computer", experience: 5, salary: 12000, date_of_joining: new Date("2018-06-01") },
+  { Tname: "Ravi", dno: 102, dname: "IT", experience: 7, salary: 15000, date_of_joining: new Date("2016-08-15") },
+  { Tname: "Sita", dno: 103, dname: "E&TC", experience: 3, salary: 11000, date_of_joining: new Date("2020-02-20") },
+  { Tname: "Maya", dno: 104, dname: "Computer", experience: 10, salary: 18000, date_of_joining: new Date("2010-04-10") },
+  { Tname: "Anil", dno: 105, dname: "E&TC", experience: 4, salary: 9000, date_of_joining: new Date("2019-12-15") }
+]);
+
+// Students Collection
+db.createCollection("Students");
+db.Students.insertMany([
+  { Sname: "John", roll_no: 1, class: "BCA" },
+  { Sname: "Doe", roll_no: 2, class: "MCA" },
+  { Sname: "xyz", roll_no: 3, class: "BTech" }
+]);
+//Q1
+db.Teachers.find({});
+//Q2
+db.Teachers.aggregate([
+  { $match: { dname: "Computer" } },
+  { $group: { _id: "$dname", avg_salary: { $avg: "$salary" } } }
+]);
+//Q3
+db.Teachers.aggregate([
+  { $match: { dname: "E&TC" } },
+  { $group: { _id: "$dname", min_salary: { $min: "$salary" }, max_salary: { $max: "$salary" } } }
+]);
+//Q4
+db.Teachers.find({
+  dname: { $in: ["Computer", "IT", "E&TC"] },
+  salary: { $gte: 10000 }
+});
+
+//Q5
+db.Students.find({
+  $or: [
+    { roll_no: 2 },
+    { Sname: "xyz" }
+  ]
+});
+
+//Q6
+db.Teachers.updateOne(
+  { Tname: "Praveen" },
+  { $set: { experience: 10 } },
+  { upsert: true } // Create a new entry if not found
+);
+
+//Q7
+db.Teachers.updateMany(
+  { dname: "IT" },
+  { $set: { dname: "COMP" } }
+);
+
+//Q8
+db.Teachers.find({}, { Tname: 1, experience: 1, _id: 0 });
+
+//Q9
+db.createCollection("Departments");
+db.Departments.save({ dno: 101, dname: "Computer" });
+
+//Q10
+db.Teachers.aggregate([
+  { $group: { _id: null, total_salary: { $sum: "$salary" } } }
+]);

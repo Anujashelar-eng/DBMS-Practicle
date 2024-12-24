@@ -1,0 +1,75 @@
+CREATE TABLE Project (
+    project_id VARCHAR2(50) PRIMARY KEY,
+    proj_name VARCHAR2(50),
+    chief_arch VARCHAR2(50)
+);
+
+CREATE TABLE Employee (
+    Emp_id NUMBER(10) PRIMARY KEY,
+    Emp_name VARCHAR2(50)
+);
+
+CREATE TABLE Assigned_To (
+    project_id VARCHAR2(50),
+    Emp_id NUMBER(10),
+    FOREIGN KEY (project_id) REFERENCES Project(project_id),
+    FOREIGN KEY (Emp_id) REFERENCES Employee(Emp_id)
+);
+
+INSERT INTO Project VALUES ('C353', 'front-end', 'xyz');
+INSERT INTO Project VALUES ('C354', 'back-end', 'abc');
+INSERT INTO Project VALUES ('C453', 'database', 'pqr');
+
+INSERT INTO Employee VALUES (111, 'Ram');
+INSERT INTO Employee VALUES (121, 'Shyam');
+INSERT INTO Employee VALUES (131, 'Jay');
+INSERT INTO Employee VALUES (141, 'Manas');
+INSERT INTO Employee VALUES (151, 'Dewang');
+INSERT INTO Employee VALUES (161, 'Shweta');
+INSERT INTO Employee VALUES (171, 'Samruddhi');
+INSERT INTO Employee VALUES (181, 'Ishaan');
+
+INSERT INTO Assigned_To VALUES ('C353', 111);
+INSERT INTO Assigned_To VALUES ('C353', 121);
+INSERT INTO Assigned_To VALUES ('C353', 131);
+INSERT INTO Assigned_To VALUES ('C354', 141);
+INSERT INTO Assigned_To VALUES ('C354', 151);
+INSERT INTO Assigned_To VALUES ('C354', 161);
+INSERT INTO Assigned_To VALUES ('C453', 171);
+INSERT INTO Assigned_To VALUES ('C453', 181);
+
+SELECT e.Emp_id, e.Emp_name
+FROM Employee e
+JOIN Assigned_To a ON e.Emp_id = a.Emp_id
+WHERE a.project_id = 'C353';
+
+SELECT e.Emp_id
+FROM Employee e
+JOIN Assigned_To a ON e.Emp_id = a.Emp_id
+WHERE a.project_id = 'C353';
+
+SELECT e.Emp_id, e.Emp_name
+FROM Employee e
+JOIN Assigned_To a ON e.Emp_id = a.Emp_id
+JOIN Project p ON a.project_id = p.project_id
+WHERE p.proj_name = 'database';
+
+SELECT e.Emp_id, e.Emp_name
+FROM Employee e
+WHERE e.Emp_id IN (
+    SELECT a.Emp_id
+    FROM Assigned_To a
+    WHERE a.project_id = 'C353'
+) AND e.Emp_id IN (
+    SELECT a.Emp_id
+    FROM Assigned_To a
+    WHERE a.project_id = 'C354'
+);
+
+SELECT e.Emp_id
+FROM Employee e
+WHERE e.Emp_id NOT IN (
+    SELECT a.Emp_id
+    FROM Assigned_To a
+    WHERE a.project_id = 'C453'
+);

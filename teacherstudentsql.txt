@@ -1,0 +1,120 @@
+-- Creating the Teachers table
+CREATE TABLE Teachers (
+    Tname VARCHAR2(50),
+    dno NUMBER,
+    dname VARCHAR2(50),
+    experience NUMBER,
+    salary NUMBER,
+    date_of_joining DATE
+);
+
+-- Creating the Students table
+CREATE TABLE Students (
+    Sname VARCHAR2(50),
+    roll_no NUMBER PRIMARY KEY,
+    class VARCHAR2(50)
+);
+
+INSERT INTO Teachers (Tname, dno, dname, experience, salary, date_of_joining) VALUES 
+('Alice', 101, 'Computer', 5, 30000, TO_DATE('2018-06-15', 'YYYY-MM-DD'));
+
+INSERT INTO Teachers (Tname, dno, dname, experience, salary, date_of_joining) VALUES 
+('Bob', 102, 'IT', 10, 45000, TO_DATE('2015-09-20', 'YYYY-MM-DD'));
+
+INSERT INTO Teachers (Tname, dno, dname, experience, salary, date_of_joining) VALUES 
+('Carol', 103, 'E&TC', 8, 28000, TO_DATE('2017-11-25', 'YYYY-MM-DD'));
+
+INSERT INTO Teachers (Tname, dno, dname, experience, salary, date_of_joining) VALUES 
+('David', 104, 'Computer', 6, 25000, TO_DATE('2018-01-10', 'YYYY-MM-DD'));
+
+INSERT INTO Teachers (Tname, dno, dname, experience, salary, date_of_joining) VALUES 
+('Eve', 105, 'IT', 12, 50000, TO_DATE('2014-04-18', 'YYYY-MM-DD'));
+
+INSERT INTO Teachers (Tname, dno, dname, experience, salary, date_of_joining) VALUES 
+('Frank', 106, 'Computer', 4, 23000, TO_DATE('2019-02-22', 'YYYY-MM-DD'));
+
+INSERT INTO Teachers (Tname, dno, dname, experience, salary, date_of_joining) VALUES 
+('Grace', 107, 'E&TC', 7, 27000, TO_DATE('2016-05-30', 'YYYY-MM-DD'));
+
+INSERT INTO Teachers (Tname, dno, dname, experience, salary, date_of_joining) VALUES 
+('Heidi', 108, 'IT', 9, 26000, TO_DATE('2016-08-12', 'YYYY-MM-DD'));
+
+INSERT INTO Teachers (Tname, dno, dname, experience, salary, date_of_joining) VALUES 
+('Ivan', 109, 'Computer', 3, 24000, TO_DATE('2020-01-05', 'YYYY-MM-DD'));
+
+INSERT INTO Teachers (Tname, dno, dname, experience, salary, date_of_joining) VALUES 
+('Judy', 110, 'E&TC', 5, 29000, TO_DATE('2018-03-17', 'YYYY-MM-DD'));
+
+
+INSERT INTO Students (Sname, roll_no, class) VALUES 
+('John', 25, 'CS3A');
+
+INSERT INTO Students (Sname, roll_no, class) VALUES 
+('Doe', 26, 'CS3B');
+
+INSERT INTO Students (Sname, roll_no, class) VALUES 
+('Smith', 27, 'CS3C');
+
+INSERT INTO Students (Sname, roll_no, class) VALUES 
+('Jane', 28, 'CS3A');
+
+INSERT INTO Students (Sname, roll_no, class) VALUES 
+('Alice', 29, 'CS3B');
+
+INSERT INTO Students (Sname, roll_no, class) VALUES 
+('Bob', 30, 'CS3C');
+
+INSERT INTO Students (Sname, roll_no, class) VALUES 
+('Charlie', 31, 'CS3A');
+
+INSERT INTO Students (Sname, roll_no, class) VALUES 
+('David', 32, 'CS3B');
+
+INSERT INTO Students (Sname, roll_no, class) VALUES 
+('Eve', 33, 'CS3C');
+
+INSERT INTO Students (Sname, roll_no, class) VALUES 
+('Frank', 34, 'CS3A');
+
+
+SELECT * FROM Teachers
+WHERE ROWNUM <= 2;
+
+SELECT * FROM Teachers
+WHERE dname = 'Computer';
+
+SELECT * FROM Teachers
+WHERE dname IN ('Computer', 'IT', 'E&TC');
+
+SELECT * FROM Teachers
+WHERE dname IN ('Computer', 'IT', 'E&TC')
+AND salary >= 25000;
+
+SELECT * FROM Students
+WHERE roll_no = 25 OR Sname = 'xyz';
+
+MERGE INTO Teachers t
+USING (SELECT 'Praveen' AS Tname FROM DUAL) src
+ON (t.Tname = src.Tname)
+WHEN MATCHED THEN
+    UPDATE SET experience = 10
+WHEN NOT MATCHED THEN
+    INSERT (Tname, dno, dname, experience, salary, date_of_joining)
+    VALUES ('Praveen', NULL, NULL, 10, NULL, NULL);
+
+UPDATE Teachers
+SET dname = 'COMP'
+WHERE dname = 'IT';
+
+SELECT Tname, experience FROM Teachers;
+
+INSERT INTO Teachers (Tname, dno, dname, experience, salary, date_of_joining)
+VALUES ('New Teacher', 111, 'New Department', 5, 30000, SYSDATE);
+
+DELETE FROM Teachers
+WHERE dname = 'IT';
+
+SELECT * FROM Teachers
+ORDER BY experience ASC
+FETCH FIRST 5 ROWS ONLY;
+

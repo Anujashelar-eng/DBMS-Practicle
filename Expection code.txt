@@ -1,0 +1,53 @@
+CREATE TABLE client_master (
+    client_id NUMBER PRIMARY KEY,
+    client_name VARCHAR2(50),
+    bal_due NUMBER
+);
+
+INSERT ALL
+    INTO client_master (client_id, client_name, bal_due) VALUES (1, 'John Doe', 500)
+    INTO client_master (client_id, client_name, bal_due) VALUES (2, 'Jane Smith', 150) -- Negative balance to trigger exception
+	INTO client_master (client_id, client_name, bal_due) VALUES (3, 'Alice Johnson', 300)
+	INTO client_master (client_id, client_name, bal_due) VALUES (4, 'Bob Brown', 0)
+	INTO client_master (client_id, client_name, bal_due) VALUES (5, 'Charlie Wilson', -50) -- Another negative balance
+	SELECT * FROM dual;
+TRUNCATE TABLE client_master;
+    
+DECLARE
+    -- Declare a custom exception for the business rule violation
+    ex_negative_balance EXCEPTION;
+
+    -- Declare a variable to store the balance due
+    v_bal_due client_master.bal_due%TYPE;
+
+    -- Declare a variable to store the client_id input from the user
+    v_client_id client_master.client_id%TYPE :=:client_id; -- Prompts for client_id input
+
+BEGIN
+    -- Retrieve the bal_due value for the specified client_id
+    SELECT bal_due
+    INTO v_bal_due
+    FROM client_master
+    WHERE client_id = v_client_id;
+
+    -- Check if the business rule is violated
+    IF v_bal_due < 0 THEN
+        -- Raise the custom exception if bal_due is less than 0
+        RAISE ex_negative_balance;
+    END IF;
+
+    -- Display message if balance is valid
+    DBMS_OUTPUT.PUT_LINE('Client ID: ' || v_client_id || 
+                         ' - Balance due is ' || v_bal_due || '. Business rule met.');
+
+EXCEPTION
+    -- Handle the custom exception for negative balance
+    WHEN ex_negative_balance THEN
+        DBMS_OUTPUT.PUT_LINE('Error: Balance due cannot be negative for Client ID: ' || v_client_id);
+
+    -- Handle case where the client_id does not exist in the table
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Error: Client ID ' || v_client_id || ' does not exist in the database.');
+
+END;
+/

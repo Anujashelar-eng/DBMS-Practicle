@@ -1,0 +1,136 @@
+-- Creating the Hotel table
+CREATE TABLE Hotel (
+    HotelNo NUMBER PRIMARY KEY,
+    HotelName VARCHAR2(100),
+    City VARCHAR2(50)
+);
+
+-- Creating the Room table with a composite primary key on (RoomNo, HotelNo)
+CREATE TABLE Room (
+    RoomNo NUMBER,
+    HotelNo NUMBER,
+    Type VARCHAR2(50),
+    Price NUMBER(10, 2),
+    PRIMARY KEY (RoomNo, HotelNo),  -- Composite primary key
+    FOREIGN KEY (HotelNo) REFERENCES Hotel(HotelNo)
+);
+
+-- Creating the Guest table
+CREATE TABLE Guest (
+    GuestNo NUMBER PRIMARY KEY,
+    GuestName VARCHAR2(100),
+    GuestAddress VARCHAR2(200)
+);
+
+-- Creating the Booking table with a foreign key referencing the composite key in Room
+CREATE TABLE Booking (
+    HotelNo NUMBER,
+    GuestNo NUMBER,
+    DateFrom DATE,
+    DateTo DATE,
+    RoomNo NUMBER,
+    PRIMARY KEY (HotelNo, GuestNo, DateFrom),
+    FOREIGN KEY (HotelNo) REFERENCES Hotel(HotelNo),
+    FOREIGN KEY (RoomNo, HotelNo) REFERENCES Room(RoomNo, HotelNo),
+    FOREIGN KEY (GuestNo) REFERENCES Guest(GuestNo)
+);
+
+-- Inserting records into Hotel table
+INSERT ALL 
+    INTO Hotel (HotelNo, HotelName, City) VALUES (1, 'Oceanview Hotel', 'Miami')
+    INTO Hotel (HotelNo, HotelName, City) VALUES (2, 'Mountain Retreat', 'Denver')
+    INTO Hotel (HotelNo, HotelName, City) VALUES (3, 'City Central', 'New York')
+    INTO Hotel (HotelNo, HotelName, City) VALUES (4, 'Grosvenor', 'London')
+    SELECT * FROM dual;
+-- Inserting records into Room table
+INSERT ALL
+    INTO Room (RoomNo, HotelNo, Type, Price) VALUES (101, 1, 'Single', 100)
+    INTO Room (RoomNo, HotelNo, Type, Price) VALUES (102, 4, 'Double', 150)
+    INTO Room (RoomNo, HotelNo, Type, Price) VALUES (201, 2, 'Single', 120)
+    INTO Room (RoomNo, HotelNo, Type, Price) VALUES (202, 2, 'Suite', 250)
+    INTO Room (RoomNo, HotelNo, Type, Price) VALUES (301, 4, 'Single', 130)
+    INTO Room (RoomNo, HotelNo, Type, Price) VALUES (302, 4, 'Double', 180)
+    SELECT * FROM dual;
+
+-- Inserting records into Guest table
+INSERT ALL
+    INTO Guest (GuestNo, GuestName, GuestAddress) VALUES (1, 'John Doe', '123 Maple St, Chicago')
+    INTO Guest (GuestNo, GuestName, GuestAddress) VALUES (2, 'Jane Smith', '456 Oak Ave, Boston')
+    INTO Guest (GuestNo, GuestName, GuestAddress) VALUES (3, 'Sam Wilson', '789 Pine Rd, Seattle')
+    SELECT * FROM dual;
+
+INSERT INTO Guest (GuestNo, GuestName, GuestAddress) VALUES (4, 'Jessica Pearson', 'Maple St, Chicago');
+INSERT INTO Guest (GuestNo, GuestName, GuestAddress) VALUES (5, 'Rachel Zane', 'Oak Ave, Boston');
+
+-- Inserting records into Booking table
+INSERT ALL 
+    INTO Booking (HotelNo, GuestNo, DateFrom, DateTo, RoomNo) VALUES (1, 1, TO_DATE('2024-11-01', 'YYYY-MM-DD'), TO_DATE('2024-11-05', 'YYYY-MM-DD'), 101)
+    INTO Booking (HotelNo, GuestNo, DateFrom, DateTo, RoomNo) VALUES (4, 2, TO_DATE('2024-11-03', 'YYYY-MM-DD'), TO_DATE('2024-11-07', 'YYYY-MM-DD'), 102)
+    INTO Booking (HotelNo, GuestNo, DateFrom, DateTo, RoomNo) VALUES (2, 1, TO_DATE('2024-11-10', 'YYYY-MM-DD'), TO_DATE('2024-11-15', 'YYYY-MM-DD'), 201)
+    INTO Booking (HotelNo, GuestNo, DateFrom, DateTo, RoomNo) VALUES (4, 3, TO_DATE('2024-11-05', 'YYYY-MM-DD'), TO_DATE('2024-11-10', 'YYYY-MM-DD'), 301)
+    SELECT * FROM dual;
+
+INSERT INTO Booking (HotelNo, GuestNo, DateFrom, DateTo, RoomNo) VALUES (1, 4, TO_DATE('2024-08-01', 'YYYY-MM-DD'), TO_DATE('2024-09-05', 'YYYY-MM-DD'), 101);
+INSERT INTO Booking (HotelNo, GuestNo, DateFrom, DateTo, RoomNo) VALUES (2, 5, TO_DATE('2024-11-11', 'YYYY-MM-DD'), TO_DATE('2024-12-07', 'YYYY-MM-DD'), 202);
+
+-- Commit to save changes
+COMMIT;
+
+-- Query 1
+SELECT * FROM Hotel;
+
+--Query 2
+SELECT COUNT(*) AS NumberOfHotels FROM Hotel;
+
+--Query 3
+SELECT r1.Type , r1.Price
+    From Room r1
+	JOIN Hotel h1 ON r1.HotelNo = h1.HotelNo
+	WHERE h1.HotelName = 'Grosvenor';
+
+--Query 4
+SELECT h.HotelName, h.HotelNo, COUNT(r.RoomNo) AS NumberOfRooms
+FROM Hotel h
+JOIN Room r ON h.HotelNo = r.HotelNo
+GROUP BY h.HotelNo, h.HotelName;
+
+--Query 5
+SELECT g.GuestNo , g.GuestName, g.GuestAddress 
+FROM Guest g
+JOIN Booking b ON g.GuestNo = b.GuestNo
+LEFT JOIN Hotel h ON b.HotelNo = h.HotelNo
+WHERE b.HotelNo = (SELECT HotelNo FROM Hotel WHERE HotelName = 'Grosvenor');
+
+--Query 6
+SELECT Type, Price FROM Room
+WHERE Price<= 150 AND Type ='Double';
+
+--Query 7
+SELECT g.GuestName , b.DateFrom, b.DateTo FROM Guest g
+LEFT JOIN Booking b ON g.GuestNo = b.GuestNo 
+WHERE EXTRACT(YEAR FROM DateFrom) = 2024
+	AND EXTRACT(MONTH FROM DateFrom) = 8;
+
+--Query 8
+SELECT h.HotelName, SUM(r.Price) AS TotalIncome
+FROM Booking b
+JOIN Room r ON b.RoomNo = r.RoomNo AND b.HotelNo = r.HotelNo
+JOIN Hotel h ON b.HotelNo = h.HotelNo
+WHERE h.HotelName = 'Grosvenor'
+  AND TRUNC(b.DateFrom) = TRUNC(SYSDATE)
+GROUP BY h.HotelName;
+
+--Query 9
+SELECT r.type,
+       COUNT(*) AS booking_count
+FROM Room r
+    JOIN Booking b ON r.RoomNo = b.RoomNo AND r.HotelNo = b.HotelNo
+    JOIN Hotel h ON b.HotelNo = h.HotelNo
+WHERE h.City= 'London'
+GROUP BY r.type
+ORDER BY booking_count DESC
+FETCH FIRST 1 ROWS ONLY;
+
+--Query 10
+UPDATE Room
+SET Price = Price + Price*0.05;
